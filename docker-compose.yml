@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: transactions
+  redis:
+    image: redis
+  app:
+    build: .
+    command: python webapp.py
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+  celery:
+    build: .
+    command: celery -A tasks.update_statistics worker --loglevel=info
+    depends_on:
+      - redis
+    env_file:
+      - .env

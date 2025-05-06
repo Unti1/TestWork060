@@ -14,5 +14,5 @@ def update_statistics(transaction_data):
     r.incr("stats:total_transactions")
     amount = transaction_data["amount"]
     r.incrbyfloat("stats:total_amount", amount)
-    transaction_id = transaction_data["transaction_id"]
+    transaction_id = transaction_data["id"]
     r.zadd("stats:top_transactions", {transaction_id: amount})

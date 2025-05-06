@@ -5,7 +5,6 @@ from fastapi.exceptions import HTTPException
 from models.transaction import Transaction
 from schemas.transaction import TransactionCreate, TransactionResponse
 from settings.config import api_key_auth, redis_client
-from tasks.update_statistics import update_statistics
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 

@@ -1,11 +1,14 @@
 from contextlib import asynccontextmanager
-
-import uvicorn
 from fastapi import FastAPI
 
-from app.statistic import router as statistic_router
+from app.statistic import router as statistics_router
 from app.transactions import router as transactions_router
 
+app = FastAPI(
+    title="Transaction Service",
+    description="REST API микросервис для работы с транзакциями",
+    version="1.0.0"
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -16,9 +19,10 @@ app = FastAPI(lifespan=lifespan)
 
 
 
-# Connect routers
+# Подключаем роутеры
 app.include_router(transactions_router)
-app.include_router(statistic_router)
+app.include_router(statistics_router)
 
 if __name__ == "__main__":
-    uvicorn.run("webapp:app", reload=True)
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

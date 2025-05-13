@@ -12,3 +12,8 @@ class TransactionCreate(BaseModel):
 class TransactionResponse(BaseModel):
     message: str
     task_id: str
+
+class StatisticsResponse(BaseModel):
+    total_transactions: int
+    average_transaction_amount: float
+    top_transactions: list[dict[str, float]]

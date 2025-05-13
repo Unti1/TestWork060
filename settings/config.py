@@ -1,10 +1,10 @@
-import os
 from pathlib import Path
 
 from fastapi.exceptions import HTTPException
-from fastapi import Header
+from fastapi import Security
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import redis
+from fastapi.security import APIKeyHeader
 
 
 class Settings(BaseSettings):
@@ -45,18 +45,16 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
-def api_key_auth(authorization: str = Header(None)):
-    if authorization is None:
-        raise HTTPException(status_code=401, detail="API Key required")
-    if not authorization.startswith("ApiKey "):
-        raise HTTPException(status_code=401, detail="Invalid API Key format")
-    api_key = authorization.split(" ")[1]
-    if api_key != os.getenv("API_KEY"):
-        raise HTTPException(status_code=403, detail="Invalid API Key")
-    return True
+# Redis клиент
+redis_client = redis.Redis.from_url(settings.get_redis_url())
 
+# API Key аутентификация
+api_key_header = APIKeyHeader(name="Authorization")
 
-# Redis connection
-redis_client = redis.Redis(
-    host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
-)
+def api_key_auth(api_key: str = Security(api_key_header)):
+    if api_key != f"ApiKey {settings.API_KEY}":
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid API Key"
+        )
+    return api_key
